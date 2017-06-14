@@ -1,5 +1,5 @@
 /*
-   Copyright (c) 2011-2013 mingw-w64 project
+   Copyright (c) 2011-2016 mingw-w64 project
 
    Permission is hereby granted, free of charge, to any person obtaining a
    copy of this software and associated documentation files (the "Software"),
@@ -68,6 +68,7 @@
 #include <signal.h>
 
 #include <sys/timeb.h>
+#include <time.h>
 
 #include "pthread_compat.h"
 
@@ -157,6 +158,23 @@ extern "C" {
 #define PTHREAD_MUTEX_ERRORCHECK_NP	PTHREAD_MUTEX_ERRORCHECK
 #define PTHREAD_MUTEX_RECURSIVE_NP	PTHREAD_MUTEX_RECURSIVE
 
+
+#ifndef _MSC_VER
+#define likely(cond) __builtin_expect((cond) != 0, 1)
+#define unlikely(cond) __builtin_expect((cond) != 0, 0)
+#else
+#define likely(cond) cond
+#define unlikely(cond) cond
+#endif
+
+
+#ifdef _MSC_VER
+#define __sync_synchronize() MemoryBarrier()
+#define __sync_lock_test_and_set(ptr, val) (intptr_t)InterlockedExchangePointer((PVOID*)(ptr), (PVOID)(val))
+#define __sync_bool_compare_and_swap(ptr, cmp, new_val) InterlockedCompareExchangePointer((PVOID *)(ptr), (PVOID)(INT_PTR)(new_val), (PVOID)(INT_PTR)(cmp))
+#define __builtin_unreachable() UNREFERENCED_PARAMETER(0)
+#endif
+
 void * WINPTHREAD_API pthread_timechange_handler_np(void * dummy);
 int    WINPTHREAD_API pthread_delay_np (const struct timespec *interval);
 int    WINPTHREAD_API pthread_num_processors_np(void);
@@ -215,6 +233,7 @@ struct _pthread_cleanup
     (*pthread_getclean() = _pthread_cup.next, ((E) ? (_pthread_cup.func((pthread_once_t *)_pthread_cup.arg)) : (void)0));}
 
 /* Windows doesn't have this, so declare it ourselves. */
+#ifdef _CRT_NO_TIME_T
 #ifndef _TIMESPEC_DEFINED
 #define _TIMESPEC_DEFINED
 struct timespec {
@@ -226,6 +245,7 @@ struct itimerspec {
   struct timespec  it_interval;  /* Timer period */
   struct timespec  it_value;     /* Timer expiration */
 };
+#endif
 #endif
 
 #ifndef SCHED_OTHER

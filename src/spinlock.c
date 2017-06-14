@@ -21,10 +21,12 @@
    DEALINGS IN THE SOFTWARE.
 */
 
+#ifdef _MSC_VER
+#include <Windows.h>
+#endif
+
 #include "pthread.h"
 
-#define likely(cond) __builtin_expect((cond) != 0, 1)
-#define unlikely(cond) __builtin_expect((cond) != 0, 0)
 
 /* We use the pthread_spinlock_t itself as a lock:
    -1 is free, 0 is locked.
@@ -53,7 +55,7 @@ pthread_spin_lock (pthread_spinlock_t *lock)
   volatile spinlock_word_t *lk = (volatile spinlock_word_t *)lock;
   while (unlikely(__sync_lock_test_and_set(lk, 0) == 0))
     do {
-      asm("pause" ::: "memory");
+        _mm_pause();
     } while (*lk == 0);
   return 0;
 }

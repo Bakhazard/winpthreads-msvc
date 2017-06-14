@@ -28,12 +28,17 @@
 #include "pthread.h"
 #include "misc.h"
 
-typedef enum {
-  Unlocked,        /* Not locked. */
-  Locked,          /* Locked but without waiters. */
-  Waiting,         /* Locked, may have waiters. */
-} mutex_state_t;
 
+typedef enum {
+    Unlocked,        /* Not locked. */
+    Locked,          /* Locked but without waiters. */
+    Waiting,         /* Locked, may have waiters. */
+#ifndef _MSC_VER
+} mutex_state_t;
+#else
+} mutex_state_e;
+typedef intptr_t mutex_state_t;
+#endif
 typedef enum {
   Normal,
   Errorcheck,
@@ -87,9 +92,6 @@ mutex_impl_init(pthread_mutex_t *m, mutex_impl_t *mi)
     return *m;
   }
 }
-
-#define likely(cond) __builtin_expect((cond) != 0, 1)
-#define unlikely(cond) __builtin_expect((cond) != 0, 0)
 
 /* Return the implementation part of a mutex, creating it if necessary.
    Return NULL on out-of-memory error. */
@@ -200,7 +202,7 @@ int pthread_mutex_timedlock(pthread_mutex_t *m, const struct timespec *ts)
   } else {
     patience = INFINITE;
   }
-  return pthread_mutex_lock_intern(m, patience);
+  return pthread_mutex_lock_intern(m, (DWORD)patience);
 }
 
 int pthread_mutex_unlock(pthread_mutex_t *m)
