@@ -1,3 +1,5 @@
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+
 add_library(winpthreads STATIC
     ./src/barrier.c
     ./src/barrier.h
@@ -18,8 +20,7 @@ add_library(winpthreads STATIC
     ./src/spinlock.c
     ./src/thread.c
     ./src/thread.h
-    ./src/winpthread_internal.h
-    ./src/wpth_ver.h
-	"${CMAKE_CURRENT_SOURCE_DIR}/include/pthread.h")
+)
 
-target_include_directories(winpthreads PUBLIC "${CMAKE_CURRENT_LIST_DIR}/include")
+target_include_directories(winpthreads PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
+MESSAGE( "${CMAKE_CURRENT_SOURCE_DIR}/include" )

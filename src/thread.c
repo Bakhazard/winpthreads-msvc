@@ -493,13 +493,26 @@ __dyn_tls_pthread (HANDLE hDllHandle, DWORD dwReason, LPVOID lpreserved)
   return TRUE;
 }
 
+
 /* TLS-runtime section variable.  */
 #ifdef _MSC_VER
-#pragma section(".CRT$XLF", shared)
+    #ifdef _WIN64
+        #pragma const_seg(".CRT$XLF")
+        EXTERN_C const
+    #else
+        #pragma data_seg(".CRT$XLF")
+        EXTERN_C
+    #endif
 #endif
-PIMAGE_TLS_CALLBACK WINPTHREADS_ATTRIBUTE((WINPTHREADS_SECTION(".CRT$XLF"))) __xl_f  = (PIMAGE_TLS_CALLBACK) __dyn_tls_pthread;
+
+PIMAGE_TLS_CALLBACK WINPTHREADS_ATTRIBUTE( ( WINPTHREADS_SECTION( ".CRT$XLF" ) ) ) __xl_f = (PIMAGE_TLS_CALLBACK)__dyn_tls_pthread;
+
 #ifdef _MSC_VER
-#pragma data_seg()
+    #ifdef _WIN64
+        #pragma const_seg()
+    #else
+        #pragma data_seg()
+    #endif //_WIN64
 #endif
 
 #ifdef WINPTHREAD_DBG
