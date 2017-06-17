@@ -1,0 +1,19 @@
+Extracted, cleaned up (read: probably broken) version of winpthreads from the mingw-w64 project.
+
+Added a CMake build file and cleaned out the rest. You can do the cmake thing, or you can just add the source files directly to your project.
+
+Basically I created this to be able to use the pthreads api from msvc, and didn't want to have the whole mingw-w64 stuff cramping my style. Fixed a handful of warnings and weird code. Test were nuked because they didn't run anyway.
+
+Livin' on the edge. Probably not a great idea to use for production code.
+
+Theoretically "upgrading" to the latest upstream stuff from mingw-w64 is a copy-paste procedure (include and source directories). Will try to keep this up to date if possible.
+
+Would definitely welcome pull requests adding the tests back and getting them runing. (Along with anything else you might want to add).
+
+
+
+p.s. Some of these changes might be worth contributing back. A lot of the code already had some bits and pieces in place for working with MSVC so I assume that MSVC support was intended at least at some time in the past. It just clearly hasn't been maintained.
+
+I'm currently using this with the latest and greatest MSVC 2017 release with warning-free compilation :)
+
+
